@@ -1900,7 +1900,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  musicToggleBtn.addEventListener('click', toggleMusic);
+  //musicToggleBtn.addEventListener('click', toggleMusic);
+  
+  
+musicToggleBtn.addEventListener('click', toggleMusic);
+
+// Thử tự động phát nhạc khi truy cập trang
+function autoStartMusic() {
+  if (isMusicPlaying) return;
+
+  try {
+    toggleMusic();
+
+    // Kiểm tra trạng thái AudioContext
+    if (audioCtx && audioCtx.state === 'suspended') {
+      // Trình duyệt chưa cho phép phát âm thanh
+      isMusicPlaying = false;
+      clearTimeout(musicTimer);
+
+      musicToggleBtn.classList.remove('playing');
+      musicIcon.textContent = '🎵';
+      musicText.textContent = 'Bật nhạc';
+    }
+  } catch (e) {
+    console.log('Đang chờ tương tác để phát nhạc');
+  }
+}
+
+// Thử phát ngay khi trang tải
+autoStartMusic();
+
+// Nếu bị chặn, phát khi người dùng tương tác lần đầu
+function startMusicOnInteraction() {
+  if (!isMusicPlaying) {
+    toggleMusic();
+  }
+
+  document.removeEventListener('pointerdown', startMusicOnInteraction);
+  document.removeEventListener('keydown', startMusicOnInteraction);
+}
+
+document.addEventListener('pointerdown', startMusicOnInteraction);
+document.addEventListener('keydown', startMusicOnInteraction);
+
 
   // Print Button
   printBtn.addEventListener('click', () => {
